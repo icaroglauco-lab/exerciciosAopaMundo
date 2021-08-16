@@ -1,65 +1,76 @@
 <script lang="ts">
-  import logo from './assets/svelte.png'
-  import Counter from './lib/Counter.svelte'
+  let input = "";
+  let output = "";
+  let binaryMode = false;
+
+  const handleConversion = (e) => {
+    // extract the value property
+    let {value} = e.target;
+
+    input = value
+  }
+
+  // to binary usando manipulação de array
+  const toBinary = (n:number) :number => 
+    n.toString().split('').reverse().map( (n, i) => n=='1'? 2**i : 0 ).reduce((a,b) => a+b, 0)
+
+  const toDecimal = (x:number) :number => {
+    let bin = 0;
+    let rem, i = 1;
+    while (x != 0) {
+        rem = x % 2;
+        x = parseInt(x / 2);
+        bin = bin + rem * i;
+        i = i * 10;
+    }
+    return bin;
+  }
+
+  const updateConversion = (value:string) => {
+    // check if isnt a number
+    let nvalue = parseInt(value);
+
+    if(isNaN(nvalue)){
+      return "Favor, entrada de um binário ou decimal válido"
+    }
+    else{
+      // binary mode?
+      if(binaryMode){
+        // regexp de binary válido
+        // if(!/[^2-9]*[0-1]+/.test(value)) return "Favor, binário inválido"
+        return  toDecimal(nvalue).toString()
+      }
+      else return toBinary(nvalue).toString()
+    }
+  }
+
+  $: output = updateConversion(input)
 </script>
 
-<main>
-  <img src={logo} alt="Svelte Logo" />
-  <h1>Hello Typescript!</h1>
+<!-- exercicio 9 -->
+<div class="wrapper">
+  <label for="">
+    Digite número
+    {#if binaryMode}
+    decimal
+    {:else}
+    binário
+    {/if}
+    <input type="text" bind:value={input} on:input={handleConversion}>
+  </label>
+  <label for="">
+    
+    <input type="checkbox" bind:checked={binaryMode}>
+  </label>
+  <span>{output}</span>
+</div>
+<!-- todo: routerizar os exercicios -->
 
-  <Counter />
-
-  <p>
-    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
-    apps.
-  </p>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
-    the officially supported framework, also powered by Vite!
-  </p>
-</main>
-
-<style>
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
-
-  img {
-    height: 16rem;
-    width: 16rem;
-  }
-
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
-
-  p {
-    max-width: 14rem;
-    margin: 1rem auto;
-    line-height: 1.35;
-  }
-
-  @media (min-width: 480px) {
-    h1 {
-      max-width: none;
-    }
-
-    p {
-      max-width: none;
-    }
-  }
+<style lang="sass">
+  .wrapper
+    width: 60vw
+    height: 60vh
+    margin: auto auto
+    display: flex
+    flex-direction: column
 </style>
